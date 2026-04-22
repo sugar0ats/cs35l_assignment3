@@ -1,0 +1,29 @@
+
+Entry 1
+4/21/26
+
+Goal: create a game plan
+
+Here are the constraints from the assignment page:
+
+Chorus lapilli is like tic-tac-toeLinks to an external site. in that players take turn placing pieces on a 3×3 board and the goal is to get three pieces in a row. However, it differs from tic-tac-toe in two ways:
+
+After your first three moves, instead of adding further pieces you must instead move one of your existing pieces to an adjacent empty square. Therefore, after your third move you always occupy three squares. The move can be up, down, left, right, or diagonal.
+
+If it is your turn to move and you have three pieces on the board and one of your pieces is in the center square, your move must either win or vacate the center square.
+
+From here, there are a few states that come to mind that might be helpful to track:
+
+1. turnCount - an integer representing the number of turns. If turn count is >= 4, then we enable the ability to select pieces.
+2. player1Pieces - an array of positions that correspond to where player1's pieces are
+3. player2Pieces - an array of posiitons that correspond to where player2's pieces are
+4. selectedPiece -  a bool representing if a piece has been selected. The state will be true when the user clicks a tile on the grid when it is their turn, they have a piece in that tile, and they have not currently selected a piece. The state will go back to false when the user clicks on a tile where there is no tile.
+5. currentPlayer - a bool representing which player is currently playing. If true, player1 (X) is playing. Otherwise, player2.
+6. emptyTiles - a list of positions that correspond to where no players' pieces are
+7. canSelectPieces - a bool representing whether the players can move their pieces. If enabled, then the two-click move is enabled. Otherwise, clicking anywhere will place an element
+
+From a UI perspective, I'm thinking of these React components:
+
+1. A 3x3 table representing the gameboard
+2. Text box above representing whose turn it is
+3. Text or state change representing when a piece is selected
