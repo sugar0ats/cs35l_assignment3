@@ -12,25 +12,57 @@ function Square({value, onSquareClick}) {
 }
 
 export default function App() {
-  const [name, setName] = React.useState('World')
 
   const [squares, setSquares] = React.useState(Array(9).fill(null));
 
   const [xIsNext, setXIsNext] = React.useState(true);
 
+  const [numTurns, setNumTurns] = React.useState(0);
+
+  const [canSelectPieces, setCanSelectPieces]= React.useState(false);
+
+  const [pieceSelected, setPieceSelected] = React.useState(null);
+
   function handleClick(i) {
-    if (squares[i] || calculateWinner(squares)) {
-      return;
+    if (numTurns == 5) {
+      setCanSelectPieces(true);
+      console.log("select mode activated");
     }
+    // if (squares[i] || calculateWinner(squares)) {
+    //   return;
+    // }
+
+    // can only select x 
+    
 
     const nextSquares = squares.slice();
-    if (xIsNext) {
-      nextSquares[i] = "X";
+    if (!canSelectPieces) {
+      if (xIsNext) {
+        nextSquares[i] = "X";
+      } else {
+        nextSquares[i] = "O";
+      }
+      setNumTurns(numTurns + 1);
+      setXIsNext(!xIsNext);
     } else {
-      nextSquares[i] = "O";
+      console.log("this is select mode.");
+      console.log(squares);
+      if (!pieceSelected && (squares[i] === (xIsNext ? "O" : "X"))) {
+        console.log("successfully selected a piece");
+        setPieceSelected(i);
+      } else if (pieceSelected && (!squares[i]) && isValidMove(i, pieceSelected)) {
+        nextSquares[i] = (xIsNext ? "O" : "X");
+        nextSquares[pieceSelected] = null;
+        setPieceSelected(null);
+        setNumTurns(numTurns + 1);
+        setXIsNext(!xIsNext);
+      }
     }
+
     setSquares(nextSquares);
-    setXIsNext(!xIsNext);
+    
+
+    
   }
 
   function resetGame() {
@@ -49,6 +81,9 @@ export default function App() {
   return (
     <>
       <div className='status'>{status}</div>
+      <div className = 'status'> {numTurns}</div>
+      <div className = 'status'> piece selected: {pieceSelected ? pieceSelected : -1}</div>
+      <div className = 'status'> {} </div>
       <div className='board-row'>
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
         <Square value={squares[1]} onSquareClick={() => handleClick(1)}/>
@@ -88,6 +123,16 @@ export default function App() {
     //   </Card>
     // </div>
   )
+}
+
+// 0 1 2
+// 3 4 5 
+// 6 7 8
+
+function isValidMove(i, pieceSelected) {
+  let valid_pos = [[1, 3, 4], [0, 2, 3, 4, 5], [1, 4, 5], [0, 1, 4, 6, 7], [0, 1, 2, 3, 5, 6, 7, 8], [1, 2, 4, 7, 8], [3, 4, 7], [6, 3, 4, 5, 8], [5, 4, 7]];
+
+  return i in valid_pos[pieceSelected];
 }
 
 function calculateWinner(squares) {
