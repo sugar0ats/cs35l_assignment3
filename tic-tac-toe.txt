@@ -27,3 +27,10 @@ From a UI perspective, I'm thinking of these React components:
 1. A 3x3 table representing the gameboard
 2. Text box above representing whose turn it is
 3. Text or state change representing when a piece is selected
+
+But since I start with working on tic-tac-toe, I can use the React tutorial on the game to get a head start.
+
+Entry 2
+4/22/26
+
+I spent my free time today implementing the main 

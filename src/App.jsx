@@ -28,11 +28,22 @@ export default function App() {
       setCanSelectPieces(true);
       console.log("select mode activated");
     }
+
+    if (calculateWinner(squares)) {
+      return;
+    }
     // if (squares[i] || calculateWinner(squares)) {
     //   return;
     // }
 
     // can only select x 
+
+    // If it is your turn to move and you have three pieces on the board and one of your pieces is in the center square, your move must either win or vacate the center square.
+    // Check whose turn it is, and check for canselect piece
+    // check if the center square is populated by the current turn owner's piece
+    // check if a win is possible if the player moves one piece
+    // if so, then the player must make the winning move
+    // if not, the player must select the center piece and move it
     
 
     const nextSquares = squares.slice();
@@ -47,10 +58,28 @@ export default function App() {
     } else {
       console.log("this is select mode.");
       console.log(squares);
-      if (!pieceSelected && (squares[i] === (xIsNext ? "O" : "X"))) {
+      if (!squares[i] && pieceSelected === null) {
+        console.log("no more tiles can be placed; you can only move existing tiles. skipping");
+        return;
+      }
+      if (pieceSelected === null && (squares[i] === (xIsNext ? "O" : "X"))) {
         console.log("successfully selected a piece");
         setPieceSelected(i);
-      } else if (pieceSelected && (!squares[i]) && isValidMove(i, pieceSelected)) {
+      } else if (pieceSelected !== null) {
+        
+        if (!isValidMove(i, pieceSelected)) {
+          // if the space is free but it's not a valid move, reset as well
+          console.log("not a valid move. resetting your turn.");
+          setPieceSelected(null);
+          return;
+        }
+        if (squares[4] === (xIsNext ? "O" : "X") && !centerPieceEdgeCaseCheck(i)) {
+          // if there is something in the center piece, we need to make sure we have a valid move. if the move is invalid, deselect and return.
+          console.log("there is something in the center that i can move, and the move i've attempted is invalid.")
+          setPieceSelected(null);
+          return;
+        } 
+        console.log("place the piece down")
         nextSquares[i] = (xIsNext ? "O" : "X");
         nextSquares[pieceSelected] = null;
         setPieceSelected(null);
@@ -60,9 +89,28 @@ export default function App() {
     }
 
     setSquares(nextSquares);
-    
+  }
 
+  function centerPieceEdgeCaseCheck(i) {
+    let this_turns_symbol = xIsNext ? "O" : "X";
+    let hypothetical_squares = squares.slice();
+
+    // check if there's a symbol in the center that we selected
+    hypothetical_squares[pieceSelected] = null;
+    hypothetical_squares[i] = this_turns_symbol;
+
+    if (calculateWinner(hypothetical_squares) === this_turns_symbol) {
+      
+      console.log("this move would result in a win, so it's permitted");
+      return true;
+    }
+
+    if (pieceSelected === 4) {
+      console.log("i'm going to move the piece in the center!")
+      return true;
+    }
     
+    return false;
   }
 
   function resetGame() {
@@ -82,7 +130,7 @@ export default function App() {
     <>
       <div className='status'>{status}</div>
       <div className = 'status'> {numTurns}</div>
-      <div className = 'status'> piece selected: {pieceSelected ? pieceSelected : -1}</div>
+      <div className = 'status'> piece selected: {pieceSelected >= 0 ? pieceSelected : -1}</div>
       <div className = 'status'> {} </div>
       <div className='board-row'>
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
@@ -131,8 +179,8 @@ export default function App() {
 
 function isValidMove(i, pieceSelected) {
   let valid_pos = [[1, 3, 4], [0, 2, 3, 4, 5], [1, 4, 5], [0, 1, 4, 6, 7], [0, 1, 2, 3, 5, 6, 7, 8], [1, 2, 4, 7, 8], [3, 4, 7], [6, 3, 4, 5, 8], [5, 4, 7]];
-
-  return i in valid_pos[pieceSelected];
+  // console.log("is " + i + " in "+ valid_pos[pieceSelected]+ "? " + (parseInt(i) in valid_pos[pieceSelected]));
+  return valid_pos[pieceSelected].includes(i);
 }
 
 function calculateWinner(squares) {
@@ -146,6 +194,8 @@ function calculateWinner(squares) {
     [0, 4, 8],
     [2, 4, 6]
   ];
+
+
 
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
